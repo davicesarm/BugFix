@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QCARConfig>
   <Tracking>
+    <ImageTarget name="carta3" size="1.000000 1.598000" />
+    <ImageTarget name="carta2" size="1.000000 1.598000" />
+    <ImageTarget name="carta1" size="1.000000 1.598000" />
     <ImageTarget name="bugfixteste2" size="1.000000 0.562500" />
     <ImageTarget name="bugfixteste" size="1.000000 0.562500" />
   </Tracking>
