@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<QCARConfig>
-  <Tracking>
-    <ImageTarget name="lc" size="1.000000 1.463964" />
-    <ImageTarget name="la" size="1.000000 1.463964" />
-    <ImageTarget name="lb" size="1.000000 1.463964" />
-  </Tracking>
-</QCARConfig>
