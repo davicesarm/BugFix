@@ -445,13 +445,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   cardModelPrefab: {fileID: 34008535050137506, guid: ca0bed267f7a12640834c34ba8da78c5, type: 3}
-  vumarkIdTranslatedTexts:
-  - vumarkId: 0869ea01e5df4cf3a9d63fcba244df87
-    translatedText: Parece-se com uma soma
-  - vumarkId: 036d58e203274b32a837b082e54fb939
-    translatedText: "Parece-se com uma mulltiplica\xE7\xE3o"
-  - vumarkId: 8e74d26ceee746f8a58f977ed86a32a9
-    translatedText: Inverte o resultado da entrada
 --- !u!114 &1493742066
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -497,7 +490,7 @@ Transform:
   m_GameObject: {fileID: 1493742063}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.498, y: 0, z: 0}
+  m_LocalPosition: {x: 1.164, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
