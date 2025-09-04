@@ -23,7 +23,7 @@ MonoBehaviour:
     modelTargetRecoWhileExtendedTracked: 1
     shareRecordingsInITunes: 0
     logLevel: 0
-    version: 11.3.4
+    version: 11.2.4
     eulaAcceptedVersions: '{"Values":["11.1","11.2","11.3"]}'
   database:
     disableModelExtraction: 0

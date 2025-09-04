@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.ptc.vuforia.engine": {
-      "version": "file:com.ptc.vuforia.engine-11.3.4.tgz",
+      "version": "file:com.ptc.vuforia.engine-11.2.4.tgz",
       "depth": 0,
       "source": "local-tarball",
       "dependencies": {
@@ -9,6 +9,12 @@
         "com.unity.inputsystem": "1.11.2",
         "com.unity.nuget.newtonsoft-json": "3.2.1"
       }
+    },
+    "com.unity.2d.sprite": {
+      "version": "1.0.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {}
     },
     "com.unity.burst": {
       "version": "1.8.18",
