@@ -1,77 +1,221 @@
 using UnityEngine;
 using Vuforia;
 using System.Collections.Generic;
+using System.Collections;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class TranslateCards : DefaultObserverEventHandler
 {
     private GameObject cardModelPrefab;
-    private Dictionary<string, string> translatedTextsMap;
+
+    [SerializeField]
+    private VumarkActionDatabase actionDatabase;
+
+    [SerializeField]
+    private float repeatedScanCooldownSeconds = 0.4f;
+
+    [SerializeField]
+    private int stableIdFramesRequired = 2;
+
+    [SerializeField]
+    private int maxFramesToStabilize = 8;
+
+    private TextMeshPro cardText;
+    private VuMarkBehaviour vuMarkBehaviour;
+    private string lastScannedVumarkId;
+    private float lastScanTime;
+    private bool isSceneLoading;
+    private Coroutine trackingFoundRoutine;
 
     private void Awake()
     {
-        cardModelPrefab = transform.GetChild(0).gameObject;
-        translatedTextsMap = new()
+        if (transform.childCount > 0)
         {
-            ["036d58e203274b32a837b082e54fb939"] = "Parece-se com uma soma",
-            ["0869ea01e5df4cf3a9d63fcba244df87"] = "Parece-se com uma multiplicação",
-            ["a4271545dcdf4a1da486c52324f09808"] = "Inverte o resultado da entrada",
-            ["91eb507b040a401d81b321a10fe69e47"] = "Apenas um resultado de saída é igual a zero",
-            ["8e74d26ceee746f8a58f977ed86a32a9"] = "Apenas um resultado de saída é igual a um",
-            ["6cfef27692404e19a025dd24b60ddcf9"] = "O resultado da saída é sempre diferente do resultado da entrada",
-            ["e981e1dcbb21463882ab061294ff1c03"] = "Função Principal: A saída é nível lógico alto (1) somente se TODAS as entradas estiverem em nível lógico alto (1)",
-            ["f0f2da616a18428b91149ee9f8c56721"] = "Expressão Booleana: Q = A • B",
-            ["e4f04b73566c45f582c5869dd0884df9"] = "Função Principal: A saída é sempre o oposto lógico da única entrada",
-            ["ca0ee1c44c5e498b9da9484a4d9cff34"] = "Expressão Booleana: Q = Ā",
-            ["bb4ade09e0ba4ec0ba6e711b32b1bbbc"] = "Função Principal: A saída é nível lógico ALTO (1) se QUALQUER uma das entradas estiver em nível lógico ALTO (1)",
-            ["abac680e4b134a5e95882cec0d785a97"] = "Expressão Booleana: Q = A + B",
-            ["d5636a0f96ae46839218078825859d25"] = " ▬ ▬ ▬ características que ▬ conseguir  ▬ ▬  porta lógica \"AND\"",
-            ["ca84774151a547be8bb8109e373aecc3"] = "Carta resposta",
-            ["51d72c71b1274b9aa8ed1be9c872e603"] = "Carta glitch"
-        };
+            cardModelPrefab = transform.GetChild(0).gameObject;
+            cardText = cardModelPrefab.GetComponentInChildren<TextMeshPro>();
+        }
+        else
+        {
+            Debug.LogError("TranslateCards: objeto sem filho para cardModelPrefab.");
+        }
+
+        if (!TryGetComponent<VuMarkBehaviour>(out vuMarkBehaviour))
+        {
+            Debug.LogError("TranslateCards: VuMarkBehaviour não encontrado no mesmo GameObject.");
+        }
     }
 
     protected override void OnTrackingFound()
     {
-        ChangeCardText();
         base.OnTrackingFound();
+
+        // Limpa imediatamente para não mostrar o texto da carta anterior.
+        SetCardText(string.Empty);
+
+        if (trackingFoundRoutine != null)
+            StopCoroutine(trackingFoundRoutine);
+
+        // Aguarda o ID do VuMark estabilizar por alguns frames antes de agir.
+        trackingFoundRoutine = StartCoroutine(ExecuteVumarkActionWhenStable());
     }
 
-    private void ChangeCardText()
+    protected override void OnTrackingLost()
+    {
+        base.OnTrackingLost();
+
+        if (trackingFoundRoutine != null)
+        {
+            StopCoroutine(trackingFoundRoutine);
+            trackingFoundRoutine = null;
+        }
+
+        isSceneLoading = false;
+        lastScannedVumarkId = null;
+
+        // Mantém a UI consistente quando o alvo é perdido.
+        if (cardText != null)
+        {
+            cardText.text = string.Empty;
+        }
+    }
+
+    private IEnumerator ExecuteVumarkActionWhenStable()
+    {
+        string candidateId = null;
+        int stableCount = 0;
+
+        for (int i = 0; i < maxFramesToStabilize; i++)
+        {
+            if (TryGetVumarkId(out string currentId))
+            {
+                if (currentId == candidateId)
+                {
+                    stableCount++;
+                }
+                else
+                {
+                    candidateId = currentId;
+                    stableCount = 1;
+                }
+
+                if (stableCount >= stableIdFramesRequired)
+                {
+                    ExecuteVumarkAction(candidateId);
+                    break;
+                }
+            }
+
+            yield return null;
+        }
+
+        trackingFoundRoutine = null;
+    }
+
+    private void ExecuteVumarkAction(string vumarkId)
     {
         if (cardModelPrefab == null)
         {
-            throw new System.Exception("cardModelPrefab não está definido.");
+            Debug.LogWarning("TranslateCards: cardModelPrefab não está definido.");
+            return;
         }
-        string vumarkId = GetVumarkId();
-        string translatedText = GetTextByVumarkId(vumarkId);
-        cardModelPrefab.GetComponentInChildren<TextMeshPro>().text = translatedText;
+
+        if (actionDatabase == null)
+        {
+            Debug.LogWarning("TranslateCards: actionDatabase não está definido no Inspector.");
+            return;
+        }
+
+        if (IsRepeatedScan(vumarkId))
+            return;
+
+        if (!actionDatabase.TryGetAction(vumarkId, out var action))
+        {
+            Debug.LogWarning("TranslateCards: ID de VuMark não mapeado: " + vumarkId);
+            RegisterScan(vumarkId);
+            return;
+        }
+
+        switch (action.actionType)
+        {
+            case VumarkActionType.ShowText:
+                SetCardText(action.text);
+                break;
+
+            case VumarkActionType.ShowRandomDebuff:
+                SetCardText(ChooseRandomDebuff());
+                break;
+
+            case VumarkActionType.LoadScene:
+                if (string.IsNullOrWhiteSpace(action.sceneName))
+                {
+                    Debug.LogWarning("TranslateCards: sceneName vazio para LoadScene no VuMark: " + vumarkId);
+                    break;
+                }
+
+                if (isSceneLoading)
+                    break;
+
+                if (!Application.CanStreamedLevelBeLoaded(action.sceneName))
+                {
+                    Debug.LogError("TranslateCards: cena não está no Build Settings: " + action.sceneName);
+                    break;
+                }
+
+                isSceneLoading = true;
+                SceneManager.LoadScene(action.sceneName);
+                break;
+
+            case VumarkActionType.None:
+            default:
+                Debug.Log("VuMark sem ação: " + vumarkId);
+                break;
+        }
+
+        RegisterScan(vumarkId);
     }
 
-    private string GetVumarkId()
+    private bool TryGetVumarkId(out string vumarkId)
     {
-       if (!TryGetComponent<VuMarkBehaviour>(out var vumarkBehaviour))
-       {
-            throw new System.Exception("VumarkBehavior not found.");
-       }
-       return vumarkBehaviour.InstanceId.StringValue;
+        vumarkId = null;
+
+        if (vuMarkBehaviour == null)
+        {
+            Debug.LogWarning("TranslateCards: VuMarkBehaviour não disponível.");
+            return false;
+        }
+
+        vumarkId = vuMarkBehaviour.InstanceId.StringValue;
+
+        if (string.IsNullOrWhiteSpace(vumarkId))
+        {
+            return false;
+        }
+
+        return true;
     }
 
-    private string GetTextByVumarkId(string vumarkId)
+    private bool IsRepeatedScan(string vumarkId)
     {
-        if (translatedTextsMap.ContainsKey(vumarkId))
+        return lastScannedVumarkId == vumarkId &&
+               Time.time - lastScanTime < repeatedScanCooldownSeconds;
+    }
+
+    private void RegisterScan(string vumarkId)
+    {
+        lastScannedVumarkId = vumarkId;
+        lastScanTime = Time.time;
+    }
+
+    private void SetCardText(string text)
+    {
+        if (cardText == null)
         {
-            string translatedText = translatedTextsMap[vumarkId];
-            if (translatedText == "Carta glitch")
-            {
-                translatedText = ChooseRandomDebuff();
-            }
-            return translatedText;
+            Debug.LogWarning("TranslateCards: TextMeshPro não encontrado em cardModelPrefab.");
+            return;
         }
-        else
-        {
-            throw new System.Exception("ID de VuMark não mapeado: " + vumarkId);
-        }
+
+        cardText.text = text;
     }
 
     private string ChooseRandomDebuff()
