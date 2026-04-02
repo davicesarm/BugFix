@@ -1,0 +1,77 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 613d16480d3664c49a70ac3d97a25e43, type: 3}
+  m_Name: VumarkActionDatabase
+  m_EditorClassIdentifier: 
+  actions:
+  - vumarkId: 036d58e203274b32a837b082e54fb939
+    actionType: 0
+    text: Parece-se com uma soma
+    sceneName: 
+  - vumarkId: 0869ea01e5df4cf3a9d63fcba244df87
+    actionType: 0
+    text: Parece-se com uma multiplicacao
+    sceneName: 
+  - vumarkId: a4271545dcdf4a1da486c52324f09808
+    actionType: 0
+    text: Inverte o resultado da entrada
+    sceneName: 
+  - vumarkId: 91eb507b040a401d81b321a10fe69e47
+    actionType: 0
+    text: Apenas um resultado de saida e igual a zero
+    sceneName: 
+  - vumarkId: 8e74d26ceee746f8a58f977ed86a32a9
+    actionType: 0
+    text: Apenas um resultado de saida e igual a um
+    sceneName: 
+  - vumarkId: 6cfef27692404e19a025dd24b60ddcf9
+    actionType: 0
+    text: O resultado da saida e sempre diferente do resultado da entrada
+    sceneName: 
+  - vumarkId: e981e1dcbb21463882ab061294ff1c03
+    actionType: 0
+    text: 'Funcao Principal: A saida e nivel logico alto (1) somente se TODAS as
+      entradas estiverem em nivel logico alto (1)'
+    sceneName: 
+  - vumarkId: f0f2da616a18428b91149ee9f8c56721
+    actionType: 0
+    text: "Expressao Booleana: Q = A \u2022 B"
+    sceneName: 
+  - vumarkId: e4f04b73566c45f582c5869dd0884df9
+    actionType: 0
+    text: 'Funcao Principal: A saida e sempre o oposto logico da unica entrada'
+    sceneName: 
+  - vumarkId: ca0ee1c44c5e498b9da9484a4d9cff34
+    actionType: 0
+    text: 'Expressao Booleana: Q = A barra'
+    sceneName: 
+  - vumarkId: bb4ade09e0ba4ec0ba6e711b32b1bbbc
+    actionType: 0
+    text: 'Funcao Principal: A saida e nivel logico ALTO (1) se QUALQUER uma das
+      entradas estiver em nivel logico ALTO (1)'
+    sceneName: 
+  - vumarkId: abac680e4b134a5e95882cec0d785a97
+    actionType: 0
+    text: 'Expressao Booleana: Q = A + B'
+    sceneName: 
+  - vumarkId: d5636a0f96ae46839218078825859d25
+    actionType: 0
+    text: caracteristicas que voce consegue em uma porta logica AND
+    sceneName: 
+  - vumarkId: ca84774151a547be8bb8109e373aecc3
+    actionType: 0
+    text: Carta resposta
+    sceneName: 
+  - vumarkId: 51d72c71b1274b9aa8ed1be9c872e603
+    actionType: 1
+    text: 
+    sceneName: 

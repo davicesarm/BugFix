@@ -1,0 +1,23 @@
+# Banco central de acoes por VuMark
+# Formato: vumarkId|actionType|...
+# actionType: ShowText | ShowRandomDebuff | LoadScene | None
+# Quando actionType nao usa um campo, deixe vazio.
+
+036d58e203274b32a837b082e54fb939|ShowText|Parece-se com uma soma|
+0869ea01e5df4cf3a9d63fcba244df87|ShowText|Parece-se com uma multiplicacao|
+a4271545dcdf4a1da486c52324f09808|ShowText|Inverte o resultado da entrada|
+91eb507b040a401d81b321a10fe69e47|ShowText|Apenas um resultado de saida e igual a zero|
+8e74d26ceee746f8a58f977ed86a32a9|ShowText|Apenas um resultado de saida e igual a um|
+6cfef27692404e19a025dd24b60ddcf9|ShowText|O resultado da saida e sempre diferente do resultado da entrada|
+e981e1dcbb21463882ab061294ff1c03|ShowText|Funcao Principal: A saida e nivel logico alto (1) somente se TODAS as entradas estiverem em nivel logico alto (1)|
+f0f2da616a18428b91149ee9f8c56721|ShowText|Expressao Booleana: Q = A • B|
+e4f04b73566c45f582c5869dd0884df9|ShowText|Funcao Principal: A saida e sempre o oposto logico da unica entrada|
+ca0ee1c44c5e498b9da9484a4d9cff34|ShowText|Expressao Booleana: Q = A barra|
+bb4ade09e0ba4ec0ba6e711b32b1bbbc|ShowText|Funcao Principal: A saida e nivel logico ALTO (1) se QUALQUER uma das entradas estiver em nivel logico ALTO (1)|
+abac680e4b134a5e95882cec0d785a97|ShowText|Expressao Booleana: Q = A + B|
+d5636a0f96ae46839218078825859d25|ShowText|caracteristicas que voce consegue em uma porta logica AND|
+ca84774151a547be8bb8109e373aecc3|ShowText|Carta resposta|
+51d72c71b1274b9aa8ed1be9c872e603|ShowRandomDebuff||
+
+# Exemplo para iniciar minigame:
+# 11111111111111111111111111111111|LoadScene||Minigame
