@@ -13,7 +13,15 @@ MonoBehaviour:
   m_Name: MiniGameQuestionBank
   m_EditorClassIdentifier: 
   questions:
-  - questionText: Teste 1?
-    correctAnswerIndex: 1
-  - questionText: Teste 2?
+  - questionText: Pergunta 1 (A)
+    answers:
+    - A) Resposta 1
+    - B) Resposta 2
+    - A) Resposta 1
     correctAnswerIndex: 0
+  - questionText: Question 2 (C)
+    answers:
+    - A) Answer 1
+    - A) Answer 2
+    - C) Answer 3
+    correctAnswerIndex: 2
