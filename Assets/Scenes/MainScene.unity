@@ -1716,41 +1716,10 @@ MonoBehaviour:
   OnTargetLost:
     m_PersistentCalls:
       m_Calls: []
-  vumarkTextEntries:
-  - vumarkId: 036d58e203274b32a837b082e54fb939
-    translatedText: Parece-se com uma soma
-  - vumarkId: 0869ea01e5df4cf3a9d63fcba244df87
-    translatedText: Parece-se com uma multiplicacao
-  - vumarkId: a4271545dcdf4a1da486c52324f09808
-    translatedText: Inverte o resultado da entrada
-  - vumarkId: 91eb507b040a401d81b321a10fe69e47
-    translatedText: Apenas um resultado de saida e igual a zero
-  - vumarkId: 8e74d26ceee746f8a58f977ed86a32a9
-    translatedText: Apenas um resultado de saida e igual a um
-  - vumarkId: 6cfef27692404e19a025dd24b60ddcf9
-    translatedText: O resultado da saida e sempre diferente do resultado da entrada
-  - vumarkId: e981e1dcbb21463882ab061294ff1c03
-    translatedText: 'Funcao Principal: A saida e nivel logico alto (1) somente se
-      TODAS as entradas estiverem em nivel logico alto (1)'
-  - vumarkId: f0f2da616a18428b91149ee9f8c56721
-    translatedText: "Expressao Booleana: Q = A \u2022 B"
-  - vumarkId: e4f04b73566c45f582c5869dd0884df9
-    translatedText: 'Funcao Principal: A saida e sempre o oposto logico da unica
-      entrada'
-  - vumarkId: ca0ee1c44c5e498b9da9484a4d9cff34
-    translatedText: 'Expressao Booleana: Q = A barra'
-  - vumarkId: bb4ade09e0ba4ec0ba6e711b32b1bbbc
-    translatedText: 'Funcao Principal: A saida e nivel logico ALTO (1) se QUALQUER
-      uma das entradas estiver em nivel logico ALTO (1)'
-  - vumarkId: abac680e4b134a5e95882cec0d785a97
-    translatedText: 'Expressao Booleana: Q = A + B'
-  - vumarkId: d5636a0f96ae46839218078825859d25
-    translatedText: " \u25AC \u25AC \u25AC caracter\xEDsticas que \u25AC conseguir 
-      \u25AC \u25AC  porta l\xF3gica \"AND\""
-  - vumarkId: ca84774151a547be8bb8109e373aecc3
-    translatedText: Carta resposta
-  - vumarkId: 51d72c71b1274b9aa8ed1be9c872e603
-    translatedText: Carta glitch
+  actionDatabase: {fileID: 11400000, guid: 2440834706601d14880739e0b4998b89, type: 2}
+  repeatedScanCooldownSeconds: 0.4
+  stableIdFramesRequired: 2
+  maxFramesToStabilize: 8
 --- !u!114 &1493742069
 MonoBehaviour:
   m_ObjectHideFlags: 0
