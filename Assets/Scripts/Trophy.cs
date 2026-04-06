@@ -7,4 +7,5 @@ public class Trophy : ScriptableObject
     public string trophyName;
     public string description;
     public GameObject model;
+    public Sprite icon;
 }
