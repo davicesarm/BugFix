@@ -13,15 +13,79 @@ MonoBehaviour:
   m_Name: MiniGameQuestionBank
   m_EditorClassIdentifier: 
   questions:
-  - questionText: Pergunta 1 (A)
+  - questionText: It resembles a multiplication
     answers:
-    - A) Resposta 1
-    - B) Resposta 2
-    - A) Resposta 1
+    - AND
+    - OR
+    - NOT
     correctAnswerIndex: 0
-  - questionText: Question 2 (C)
+  - questionText: Only one operation output is 1 (TRUE).
     answers:
-    - A) Answer 1
-    - A) Answer 2
-    - C) Answer 3
+    - AND
+    - OR
+    - NOT
+    correctAnswerIndex: 0
+  - questionText: "Boolean Expression:\r\nQ = A \u2022 B"
+    answers:
+    - AND
+    - OR
+    - NOT
+    correctAnswerIndex: 0
+  - questionText: 'The output is 1 (TRUE) only
+
+      if all inputs are 1 (TRUE)'
+    answers:
+    - AND
+    - OR
+    - NOT
+    correctAnswerIndex: 0
+  - questionText: It resembles an addition
+    answers:
+    - AND
+    - OR
+    - NOT
+    correctAnswerIndex: 1
+  - questionText: Only one operation result is 0 (FALSE)
+    answers:
+    - AND
+    - OR
+    - NOT
+    correctAnswerIndex: 1
+  - questionText: 'Boolean Expression:
+
+      Q = A + B '
+    answers:
+    - AND
+    - OR
+    - NOT
+    correctAnswerIndex: 1
+  - questionText: 'The output is 1 (TRUE) if any of the inputs is
+
+      1 (TRUE)'
+    answers:
+    - AND
+    - OR
+    - NOT
+    correctAnswerIndex: 1
+  - questionText: The output inverts the input
+    answers:
+    - AND
+    - OR
+    - NOT
+    correctAnswerIndex: 2
+  - questionText: 'The output is always
+
+      different from the input '
+    answers:
+    - AND
+    - OR
+    - NOT
+    correctAnswerIndex: 2
+  - questionText: 'The output is always
+
+      the opposite of the input '
+    answers:
+    - AND
+    - OR
+    - NOT
     correctAnswerIndex: 2
