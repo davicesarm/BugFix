@@ -75,3 +75,7 @@ MonoBehaviour:
     actionType: 1
     text: 
     sceneName: 
+  - vumarkId: 9a10594a401f4d20b320448b638fd29f
+    actionType: 2
+    text: 
+    sceneName: Minigame
