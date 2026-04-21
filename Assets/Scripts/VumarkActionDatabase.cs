@@ -17,6 +17,8 @@ public class VumarkActionEntry
     public VumarkActionType actionType = VumarkActionType.ShowText;
     [TextArea(2, 5)]
     public string text;
+    [TextArea(2, 5)]
+    public string textNoHints;
     public string sceneName;
 }
 

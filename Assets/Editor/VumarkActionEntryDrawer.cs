@@ -13,6 +13,7 @@ public class VumarkActionEntryDrawer : PropertyDrawer
         var vumarkIdProp = property.FindPropertyRelative("vumarkId");
         var actionTypeProp = property.FindPropertyRelative("actionType");
         var textProp = property.FindPropertyRelative("text");
+        var textNoHintsProp = property.FindPropertyRelative("textNoHints");
         var sceneNameProp = property.FindPropertyRelative("sceneName");
 
         float y = position.y;
@@ -47,12 +48,20 @@ public class VumarkActionEntryDrawer : PropertyDrawer
         if (actionType == VumarkActionType.ShowText)
         {
             Rect textLabelRect = new Rect(position.x, y, width, EditorGUIUtility.singleLineHeight);
-            EditorGUI.LabelField(textLabelRect, textProp.displayName);
+            EditorGUI.LabelField(textLabelRect, "Texto (com dicas)");
             y += EditorGUIUtility.singleLineHeight + VerticalSpacing;
 
             float textAreaHeight = EditorGUIUtility.singleLineHeight * 3f;
             Rect textAreaRect = new Rect(position.x, y, width, textAreaHeight);
             textProp.stringValue = EditorGUI.TextArea(textAreaRect, textProp.stringValue);
+            y += textAreaHeight + VerticalSpacing;
+
+            Rect textNoHintsLabelRect = new Rect(position.x, y, width, EditorGUIUtility.singleLineHeight);
+            EditorGUI.LabelField(textNoHintsLabelRect, "Texto (sem dicas)");
+            y += EditorGUIUtility.singleLineHeight + VerticalSpacing;
+
+            Rect textNoHintsAreaRect = new Rect(position.x, y, width, textAreaHeight);
+            textNoHintsProp.stringValue = EditorGUI.TextArea(textNoHintsAreaRect, textNoHintsProp.stringValue);
             y += textAreaHeight + VerticalSpacing;
         }
         else if (actionType == VumarkActionType.LoadScene)
@@ -69,8 +78,6 @@ public class VumarkActionEntryDrawer : PropertyDrawer
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
     {
         var actionTypeProp = property.FindPropertyRelative("actionType");
-        var textProp = property.FindPropertyRelative("text");
-
         float height = 0f;
 
         height += EditorGUIUtility.singleLineHeight + VerticalSpacing; // foldout
@@ -85,8 +92,10 @@ public class VumarkActionEntryDrawer : PropertyDrawer
 
         if (actionType == VumarkActionType.ShowText)
         {
-            height += EditorGUIUtility.singleLineHeight + VerticalSpacing; // label "Text"
-            height += EditorGUIUtility.singleLineHeight * 3f + VerticalSpacing; // text area
+            height += EditorGUIUtility.singleLineHeight + VerticalSpacing; // label "Texto (com dicas)"
+            height += EditorGUIUtility.singleLineHeight * 3f + VerticalSpacing; // text area (com dicas)
+            height += EditorGUIUtility.singleLineHeight + VerticalSpacing; // label "Texto (sem dicas)"
+            height += EditorGUIUtility.singleLineHeight * 3f + VerticalSpacing; // text area (sem dicas)
         }
         else if (actionType == VumarkActionType.LoadScene)
         {
