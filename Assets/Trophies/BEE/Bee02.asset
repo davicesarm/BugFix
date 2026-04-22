@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c762df523a5e5e443a0a75289bcdbc63, type: 3}
+  m_Name: Bee02
+  m_EditorClassIdentifier: 
+  trophyId: BEE02
+  trophyName: Bee 02
+  description: B
+  model: {fileID: 8847242335712014154, guid: d40ee19a6294d2e41a311a173c29858c, type: 3}
+  icon: {fileID: 0}
