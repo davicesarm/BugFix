@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c762df523a5e5e443a0a75289bcdbc63, type: 3}
   m_Name: Ladybug01
   m_EditorClassIdentifier: 
-  trophyId: KW01
-  trophyName: Kuwagata 01
+  trophyId: LB01
+  trophyName: Ladybug 01
   description: A
-  model: {fileID: 7619950003478346672, guid: 6c8e4799e6aa5e448b56f78e273b81a6, type: 3}
+  model: {fileID: -6000011295490453512, guid: 8fe65d95c09fc0e4d90c77690699e998, type: 3}
   icon: {fileID: 0}
