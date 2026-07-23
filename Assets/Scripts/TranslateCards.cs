@@ -666,10 +666,10 @@ public class TranslateCards : DefaultObserverEventHandler
     {
         var debuffs = new List<string>
         {
-            "Positivo: Retire uma carta do tabuleiro (dá direito a mais um erro ou anula um erro anterior cometido, retornando a carta para a mão do jogador) ou ganhe mais um uso do VU Mark",
-            "Neutro: Nenhuma ação é realizada. Uma mensagem é exibida, tipo: [você sabia que...] \"Did you know that...\" e uma informação interessante que pode ajudar ou já ter sido usada anteriormente",
-            "Sem efeito: BugFix está corrigindo os erros de programação e tem feito um ótimo trabalho. Este Glitch já foi corrigido com sucesso!",
-            "Negativo: Adicione uma carta ao tabuleiro ou perca uma chance de usar o VU Mark.",
+            "Congratulatuons! The battery has one more help point!",
+            "Bug detected! Um glitch impediu a ativacao do efeito desta vez...",
+            "You destroyed one bug! Remove one bug from The board!",
+            "You destroyed one bug! Remove one bug from The board!",
         };
         int randomIndex = UnityEngine.Random.Range(0, debuffs.Count);
         return debuffs[randomIndex];
