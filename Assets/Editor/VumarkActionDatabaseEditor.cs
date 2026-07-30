@@ -1,12 +1,13 @@
 using System;
 using System.IO;
+using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
 
 [CustomEditor(typeof(VumarkActionDatabase))]
 public class VumarkActionDatabaseEditor : Editor
 {
-    private const string SourcePath = "Assets/StreamingAssets/vumark_ids.txt";
+    private const string SourcePath = "Assets/StreamingAssets/vumark_actions.json";
 
     public override void OnInspectorGUI()
     {
@@ -25,15 +26,15 @@ public class VumarkActionDatabaseEditor : Editor
     {
         EditorGUILayout.LabelField("Import", EditorStyles.boldLabel);
         EditorGUILayout.HelpBox(
-            "Importa dados do arquivo: " + SourcePath + "\nFormato: vumarkId|actionType|text|sceneName",
+            "Importa dados do arquivo: " + SourcePath + "\nFormato: { vumarkId: { acao, texto_traduzido, texto_sem_dicas, scene_name } }",
             MessageType.Info
         );
 
         using (new EditorGUILayout.HorizontalScope())
         {
-            if (GUILayout.Button("Importar do TXT"))
+            if (GUILayout.Button("Importar do JSON"))
             {
-                ImportFromTxt();
+                ImportFromJson();
             }
 
             if (GUILayout.Button("Limpar Lista"))
@@ -55,7 +56,7 @@ public class VumarkActionDatabaseEditor : Editor
         AssetDatabase.SaveAssets();
     }
 
-    private void ImportFromTxt()
+    private void ImportFromJson()
     {
         if (!File.Exists(SourcePath))
         {
@@ -63,29 +64,40 @@ public class VumarkActionDatabaseEditor : Editor
             return;
         }
 
-        string[] lines = File.ReadAllLines(SourcePath);
+        string jsonText = File.ReadAllText(SourcePath);
+        JObject root;
+
+        try
+        {
+            root = JObject.Parse(jsonText);
+        }
+        catch (Exception ex)
+        {
+            EditorUtility.DisplayDialog("JSON invalido", "Falha ao ler JSON:\n" + ex.Message, "OK");
+            return;
+        }
+
         SerializedProperty actionsProp = serializedObject.FindProperty("actions");
 
         actionsProp.ClearArray();
 
         int imported = 0;
-        for (int i = 0; i < lines.Length; i++)
+        foreach (var vumarkProperty in root.Properties())
         {
-            string line = lines[i]?.Trim();
-            if (string.IsNullOrEmpty(line) || line.StartsWith("#"))
-                continue;
-
-            string[] parts = line.Split('|');
-            if (parts.Length < 4)
-                continue;
-
-            string vumarkId = parts[0].Trim();
-            string actionTypeRaw = parts[1].Trim();
-            string text = parts[2];
-            string sceneName = parts[3].Trim();
-
+            string vumarkId = vumarkProperty.Name?.Trim();
             if (string.IsNullOrWhiteSpace(vumarkId))
                 continue;
+
+            if (vumarkProperty.Value is not JObject data)
+                continue;
+
+            string actionTypeRaw = ReadFirstNonEmpty(data, "acao", "actionType");
+            if (string.IsNullOrWhiteSpace(actionTypeRaw))
+                actionTypeRaw = VumarkActionType.ShowText.ToString();
+
+            string text = ReadFirstNonEmpty(data, "texto_traduzido", "text", "texto");
+            string textNoHints = ReadFirstNonEmpty(data, "texto_sem_dicas", "texto_sem_dica", "textNoHints");
+            string sceneName = ReadFirstNonEmpty(data, "scene_name", "sceneName");
 
             if (!Enum.TryParse(actionTypeRaw, true, out VumarkActionType actionType))
                 actionType = VumarkActionType.None;
@@ -97,6 +109,7 @@ public class VumarkActionDatabaseEditor : Editor
             entry.FindPropertyRelative("vumarkId").stringValue = vumarkId;
             entry.FindPropertyRelative("actionType").enumValueIndex = (int)actionType;
             entry.FindPropertyRelative("text").stringValue = text;
+            entry.FindPropertyRelative("textNoHints").stringValue = textNoHints;
             entry.FindPropertyRelative("sceneName").stringValue = sceneName;
             entry.isExpanded = false;
 
@@ -108,5 +121,24 @@ public class VumarkActionDatabaseEditor : Editor
         AssetDatabase.SaveAssets();
 
         EditorUtility.DisplayDialog("Importacao concluida", $"{imported} entries importadas.", "OK");
+    }
+
+    private static string ReadFirstNonEmpty(JObject data, params string[] keys)
+    {
+        for (int i = 0; i < keys.Length; i++)
+        {
+            JToken token = data[keys[i]];
+            if (token == null)
+                continue;
+
+            string value = token.Type == JTokenType.String
+                ? token.Value<string>()
+                : token.ToString();
+
+            if (!string.IsNullOrWhiteSpace(value))
+                return value.Trim();
+        }
+
+        return string.Empty;
     }
 }

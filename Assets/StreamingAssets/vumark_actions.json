@@ -1,0 +1,202 @@
+{
+  "afe287648780478b94b00451e51c9b6d": {
+    "acao": "ShowText",
+    "texto_original": "Display a message with the the name of the game",
+    "texto_traduzido": "Exiba uma mensagem com o nome do jogo"
+  },
+  "fa9bfd0ed9a3478a865a4f462b9e6d6d": {
+    "acao": "ShowText",
+    "texto_original": "Ask the player to guess/write the correct number",
+    "texto_traduzido": "Peca ao jogador para chutar/escrever o numero correto"
+  },
+  "e5b21be0b6764dea88257d8fdc0d1cc7": {
+    "acao": "ShowText",
+    "texto_original": "Convert the guess to an integer number",
+    "texto_traduzido": "Converta o palpite para um numero inteiro"
+  },
+  "185d160e6ccf48a5b57dc3257fe60f0e": {
+    "acao": "ShowText",
+    "texto_original": "Is the number equal to 53?",
+    "texto_traduzido": "O numero e igual a 53?"
+  },
+  "9b97d0de7eaf46fcb2b279e9d5f5ebde": {
+    "acao": "ShowText",
+    "texto_original": "Display a 'you win the game' message",
+    "texto_traduzido": "Exiba uma mensagem de 'voce venceu o jogo'"
+  },
+  "3dc7f9f28b9547f5ae4c35d6dcda6948": {
+    "acao": "ShowText",
+    "texto_original": "If [the number is] not [53]",
+    "texto_traduzido": "Se [o numero] nao [for 53]"
+  },
+  "2eb7a944061b48d183b2c44da53a2fb1": {
+    "acao": "ShowText",
+    "texto_original": "Display a message with the consequences for the wrong number",
+    "texto_traduzido": "Exiba uma mensagem com as consequencias do numero errado"
+  },
+  "02eeafd0c81b4527a9552641b2bb2435": {
+    "acao": "ShowText",
+    "texto_original": "Display a message to end the program",
+    "texto_traduzido": "Exiba uma mensagem para terminar o programa"
+  },
+  "14ba98f0d18b4001bef9360bb53bf776": {
+    "acao": "ShowText",
+    "texto_original": "Display the Glitch Master initial message",
+    "texto_traduzido": "Exiba a mensagem inicial do Glitch Master"
+  },
+  "0f67a295ee004ad891fb50d3d7145d3b": {
+    "acao": "ShowText",
+    "texto_original": "Set the variable value to zero",
+    "texto_traduzido": "Defina o valor da variavel como zero"
+  },
+  "4b418a7fe13c420b8ea3eaade680c425": {
+    "acao": "ShowText",
+    "texto_original": "Start a loop for numbers different from seventy-two",
+    "texto_traduzido": "Inicie um laco de repeticao para numeros diferentes de 72"
+  },
+  "52d11abc05024004bc390a31f92b2996": {
+    "acao": "ShowText",
+    "texto_original": "Ask the player to write a number",
+    "texto_traduzido": "Peca ao jogador para escrever um numero"
+  },
+  "c8dee21184c84e5fb8f477cdc02fb83d": {
+    "acao": "ShowText",
+    "texto_original": "Convert the value of Secret_Code to an integer",
+    "texto_traduzido": "Converta o valor de Secret_Code para um numero inteiro"
+  },
+  "ebd77418278f48ea8f3ec5e22bfe9432": {
+    "acao": "ShowText",
+    "texto_original": "Use this condition to finish the loop",
+    "texto_traduzido": "Use esta condicao para encerrar o laco"
+  },
+  "553be070cd4c4c89a187d84a00545145": {
+    "acao": "ShowText",
+    "texto_original": "Display this message if the user wins the game",
+    "texto_traduzido": "Exiba esta mensagem se o usuario vencer o jogo"
+  },
+  "1bec418cd7b24ee08abeeb43a5b710b1": {
+    "acao": "ShowText",
+    "texto_original": "On the contrary / If not, do this:",
+    "texto_traduzido": "Caso contrario / Se nao, faca isso:"
+  },
+  "5cfcea9d498e4b39817534e374b51f8b": {
+    "acao": "ShowText",
+    "texto_original": "Sets the system password",
+    "texto_traduzido": "Define a senha do sistema"
+  },
+  "36f5cf0339f941bb817ce247218a7508": {
+    "acao": "ShowText",
+    "texto_original": "Declares a variable that counts the number of attempts",
+    "texto_traduzido": "Declara uma variavel que conta o numero de tentativas"
+  },
+  "807d2fd23f924c658e9d08019453419b": {
+    "acao": "ShowText",
+    "texto_original": "Logical variable to determine if access is granted",
+    "texto_traduzido": "Variavel logica para determinar se o acesso esta concedido"
+  },
+  "5a4b577fc00c49afa24585c97c6556e8": {
+    "acao": "ShowText",
+    "texto_original": "Starts the loop to control the user's attepts",
+    "texto_traduzido": "Inicia o laco para controle das tentativas do usuario"
+  },
+  "c93fde0a60744eb1bd6376889ee015d5": {
+    "acao": "ShowText",
+    "texto_original": "Captures the user's password guess for the door",
+    "texto_traduzido": "Captura o chute de senha do usuario para a porta"
+  },
+  "abd89e9067fc45ab8a2b2000670a04b8": {
+    "acao": "ShowText",
+    "texto_original": "Tops the loop if the entered password is correct",
+    "texto_traduzido": "Interrompe o laco caso a senha digitada esteja correta"
+  },
+  "8e2394663ddc4a0080a09d65f13def44": {
+    "acao": "ShowText",
+    "texto_original": "#Adds +1 to the error counter if the password is incorrect",
+    "texto_traduzido": "Soma +1 ao contador de erros se a senha estiver incorreta"
+  },
+  "d7b1b105a97746e5a42c4848b5a32cd8": {
+    "acao": "ShowText",
+    "texto_original": "Ends the loop after three wrong attempts",
+    "texto_traduzido": "Termina o laco apos tres tentativas erradas"
+  },
+  "036d58e203274b32a837b082e54fb939": {
+    "acao": "ShowText",
+    "texto_original": "",
+    "texto_traduzido": "Parece-se com uma soma"
+  },
+  "0869ea01e5df4cf3a9d63fcba244df87": {
+    "acao": "ShowText",
+    "texto_original": "",
+    "texto_traduzido": "Parece-se com uma multiplicacao"
+  },
+  "a4271545dcdf4a1da486c52324f09808": {
+    "acao": "ShowText",
+    "texto_original": "",
+    "texto_traduzido": "Inverte o resultado da entrada"
+  },
+  "91eb507b040a401d81b321a10fe69e47": {
+    "acao": "ShowText",
+    "texto_original": "",
+    "texto_traduzido": "Apenas um resultado de saida e igual a zero"
+  },
+  "8e74d26ceee746f8a58f977ed86a32a9": {
+    "acao": "ShowText",
+    "texto_original": "",
+    "texto_traduzido": "Apenas um resultado de saida e igual a um"
+  },
+  "6cfef27692404e19a025dd24b60ddcf9": {
+    "acao": "ShowText",
+    "texto_original": "",
+    "texto_traduzido": "O resultado da saida e sempre diferente do resultado da entrada"
+  },
+  "e981e1dcbb21463882ab061294ff1c03": {
+    "acao": "ShowText",
+    "texto_original": "",
+    "texto_traduzido": "Funcao Principal: A saida e nivel logico alto (1) somente se TODAS as entradas estiverem em nivel logico alto (1)"
+  },
+  "f0f2da616a18428b91149ee9f8c56721": {
+    "acao": "ShowText",
+    "texto_original": "",
+    "texto_traduzido": "Expressao Booleana: Q = A • B"
+  },
+  "e4f04b73566c45f582c5869dd0884df9": {
+    "acao": "ShowText",
+    "texto_original": "",
+    "texto_traduzido": "Funcao Principal: A saida e sempre o oposto logico da unica entrada"
+  },
+  "ca0ee1c44c5e498b9da9484a4d9cff34": {
+    "acao": "ShowText",
+    "texto_original": "",
+    "texto_traduzido": "Expressao Booleana: Q = A barra"
+  },
+  "bb4ade09e0ba4ec0ba6e711b32b1bbbc": {
+    "acao": "ShowText",
+    "texto_original": "",
+    "texto_traduzido": "Funcao Principal: A saida e nivel logico ALTO (1) se QUALQUER uma das entradas estiver em nivel logico ALTO (1)"
+  },
+  "abac680e4b134a5e95882cec0d785a97": {
+    "acao": "ShowText",
+    "texto_original": "",
+    "texto_traduzido": "Expressao Booleana: Q = A + B"
+  },
+  "d5636a0f96ae46839218078825859d25": {
+    "acao": "ShowText",
+    "texto_original": "",
+    "texto_traduzido": "caracteristicas que voce consegue em uma porta logica AND"
+  },
+  "ca84774151a547be8bb8109e373aecc3": {
+    "acao": "ShowText",
+    "texto_original": "",
+    "texto_traduzido": "Carta resposta"
+  },
+  "51d72c71b1274b9aa8ed1be9c872e603": {
+    "acao": "ShowRandomDebuff",
+    "texto_original": "",
+    "texto_traduzido": ""
+  },
+  "4dda1f78983540bf94841185a641270b": {
+    "acao": "ShowRandomDebuff",
+    "texto_original": "",
+    "texto_traduzido": ""
+  }
+}
