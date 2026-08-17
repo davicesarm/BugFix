@@ -47,6 +47,12 @@ public class MainGameController : MonoBehaviour
         return true;
     }
 
+    public void AddHint(int amount = 1)
+    {
+        GameProgressStore.AddHint(amount);
+        RefreshHintsText();
+    }
+
     public bool IsVumarkAlreadyScanned(string vumarkId)
     {
         return GameProgressStore.IsVumarkAlreadyScanned(vumarkId);
