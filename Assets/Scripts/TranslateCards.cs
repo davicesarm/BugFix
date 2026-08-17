@@ -24,9 +24,6 @@ public class TranslateCards : DefaultObserverEventHandler
     [SerializeField]
     private int stableIdFramesRequired = 2;
 
-    [SerializeField]
-    private int maxFramesToStabilize = 8;
-
     [Header("Scan Confirmation (Card Canvas)")]
     [SerializeField]
     private GameObject confirmationButtonsContainer;
@@ -51,7 +48,8 @@ public class TranslateCards : DefaultObserverEventHandler
     private float lastScanTime;
     private bool isSceneLoading;
     private bool awaitingScanConfirmation;
-    private Coroutine trackingFoundRoutine;
+    private string stabilizingCandidateId;
+    private int stabilizingFrameCount;
     private Canvas confirmationCanvas;
     private CanvasGroup confirmationCanvasGroup;
 
@@ -89,81 +87,111 @@ public class TranslateCards : DefaultObserverEventHandler
 
     private void OnDisable()
     {
-        if (trackingFoundRoutine != null)
-        {
-            StopCoroutine(trackingFoundRoutine);
-            trackingFoundRoutine = null;
-        }
+        stabilizingCandidateId = null;
+        stabilizingFrameCount = 0;
 
         ResetConfirmationState(hideCardModel: true, clearText: true);
     }
 
     private void Update()
     {
+        HandleContinuousTrackingCheck();
         HandleManualButtonFallbackClick();
+    }
+
+    // O Vuforia nem sempre dispara OnTrackingFound/OnTrackingLost de novo ao trocar de carta
+    // (todas usam o mesmo VuMark trackable) ou ao remover a carta com Extended Tracking ativo,
+    // e às vezes o InstanceId demora alguns frames pra realmente atualizar. Por isso tudo é
+    // resolvido aqui, num único lugar, frame a frame — sem coroutines correndo em paralelo
+    // com os callbacks do SDK, que era a causa da carta "grudar" na tradução anterior.
+    private void HandleContinuousTrackingCheck()
+    {
+        bool hasValidPose = vuMarkBehaviour != null
+            && vuMarkBehaviour.TargetStatus.Status == Status.TRACKED;
+
+        if (!hasValidPose)
+        {
+            HandleCardNoLongerVisible();
+            return;
+        }
+
+        if (cardModelPrefab != null && !cardModelPrefab.activeSelf)
+        {
+            SetCardModelVisible(true);
+        }
+
+        if (!TryGetVumarkId(out string currentId))
+        {
+            stabilizingCandidateId = null;
+            stabilizingFrameCount = 0;
+            return;
+        }
+
+        string activeId = awaitingScanConfirmation ? pendingConfirmationVumarkId : lastScannedVumarkId;
+
+        if (currentId == activeId)
+        {
+            // Já é a carta que está em tela (ou sendo confirmada); nada a fazer.
+            stabilizingCandidateId = null;
+            stabilizingFrameCount = 0;
+            return;
+        }
+
+        // O ID lido é diferente do que está em tela. Só reage depois de ver o MESMO id
+        // se repetir por alguns frames seguidos, pra não confundir com leitura atrasada/instável.
+        if (currentId == stabilizingCandidateId)
+        {
+            stabilizingFrameCount++;
+        }
+        else
+        {
+            stabilizingCandidateId = currentId;
+            stabilizingFrameCount = 1;
+        }
+
+        if (stabilizingFrameCount < stableIdFramesRequired)
+            return;
+
+        // ID estabilizado: é de fato uma carta nova.
+        stabilizingCandidateId = null;
+        stabilizingFrameCount = 0;
+
+        ResetConfirmationState(hideCardModel: false, clearText: true);
+        lastScannedVumarkId = null;
+        TryStartScanConfirmation(currentId);
+    }
+
+    private void HandleCardNoLongerVisible()
+    {
+        stabilizingCandidateId = null;
+        stabilizingFrameCount = 0;
+
+        if (cardModelPrefab == null || !cardModelPrefab.activeSelf)
+            return;
+
+        ResetConfirmationState(hideCardModel: true, clearText: true);
+        lastScannedVumarkId = null;
     }
 
     protected override void OnTrackingFound()
     {
         base.OnTrackingFound();
 
+        // A detecção e a ação em si ficam por conta do HandleContinuousTrackingCheck (Update),
+        // que já roda todo frame e evita duas rotinas competindo pelo mesmo ID.
         SetCardModelVisible(true);
-
-        // Limpa imediatamente para não mostrar o texto da carta anterior.
-        ResetConfirmationState(hideCardModel: false, clearText: true);
-
-        if (trackingFoundRoutine != null)
-            StopCoroutine(trackingFoundRoutine);
-
-        // Aguarda o ID do VuMark estabilizar por alguns frames antes de agir.
-        trackingFoundRoutine = StartCoroutine(ExecuteVumarkActionWhenStable());
     }
 
     protected override void OnTrackingLost()
     {
         base.OnTrackingLost();
 
-        if (trackingFoundRoutine != null)
-        {
-            StopCoroutine(trackingFoundRoutine);
-            trackingFoundRoutine = null;
-        }
+        stabilizingCandidateId = null;
+        stabilizingFrameCount = 0;
 
         ResetConfirmationState(hideCardModel: true, clearText: true);
         isSceneLoading = false;
         lastScannedVumarkId = null;
-    }
-
-    private IEnumerator ExecuteVumarkActionWhenStable()
-    {
-        string candidateId = null;
-        int stableCount = 0;
-
-        for (int i = 0; i < maxFramesToStabilize; i++)
-        {
-            if (TryGetVumarkId(out string currentId))
-            {
-                if (currentId == candidateId)
-                {
-                    stableCount++;
-                }
-                else
-                {
-                    candidateId = currentId;
-                    stableCount = 1;
-                }
-
-                if (stableCount >= stableIdFramesRequired)
-                {
-                    TryStartScanConfirmation(candidateId);
-                    break;
-                }
-            }
-
-            yield return null;
-        }
-
-        trackingFoundRoutine = null;
     }
 
     private void TryStartScanConfirmation(string vumarkId)
@@ -185,6 +213,17 @@ public class TranslateCards : DefaultObserverEventHandler
         if (isAlreadyScanned)
         {
             Debug.Log($"TranslateCards: VuMark '{vumarkId}' já foi escaneado. Executando direto.");
+            MarkVumarkAsScanned(vumarkId);
+            ExecuteVumarkAction(vumarkId, forceNoHintsText: false);
+            return;
+        }
+
+        // Cartas de debuff aleatório não custam dica: leem direto, sem confirmação.
+        if (actionDatabase != null &&
+            actionDatabase.TryGetAction(vumarkId, out var pendingAction) &&
+            pendingAction.actionType == VumarkActionType.ShowRandomDebuff)
+        {
+            Debug.Log($"TranslateCards: VuMark '{vumarkId}' é debuff aleatório. Executando sem gastar dica.");
             MarkVumarkAsScanned(vumarkId);
             ExecuteVumarkAction(vumarkId, forceNoHintsText: false);
             return;
@@ -647,11 +686,33 @@ public class TranslateCards : DefaultObserverEventHandler
             actionDatabase.TryGetAction(vumarkId, out var action) &&
             action.actionType == VumarkActionType.ShowText)
         {
-            SetCardText(GetShowText(action, forceNoHintsText: true));
+            string originalText = GetShowText(action, forceNoHintsText: true);
+            SetCardText(GenerateEncryptedText(originalText));
             return;
         }
 
         SetCardText(GetNoHintsMessage());
+    }
+
+    // Conjunto de caracteres usados para "criptografar" o texto quando as dicas acabam.
+    private static readonly char[] EncryptionCharset = { '#', '@', '!', '%', '$', '&', '*', '¨' };
+
+    private string GenerateEncryptedText(string source)
+    {
+        if (string.IsNullOrEmpty(source))
+            return source;
+
+        var sb = new System.Text.StringBuilder(source.Length);
+
+        foreach (char c in source)
+        {
+            // Preserva espaços para manter a "forma" do texto original, mas embaralha o resto.
+            sb.Append(char.IsWhiteSpace(c)
+                ? c
+                : EncryptionCharset[UnityEngine.Random.Range(0, EncryptionCharset.Length)]);
+        }
+
+        return sb.ToString();
     }
 
     private string GetShowText(VumarkActionEntry action, bool forceNoHintsText)
@@ -672,6 +733,24 @@ public class TranslateCards : DefaultObserverEventHandler
             "You destroyed one bug! Remove one bug from The board!",
         };
         int randomIndex = UnityEngine.Random.Range(0, debuffs.Count);
-        return debuffs[randomIndex];
+        string chosenDebuff = debuffs[randomIndex];
+
+        if (chosenDebuff == "Congratulatuons! The battery has one more help point!")
+        {
+            AddHint();
+        }
+
+        return chosenDebuff;
+    }
+
+    private void AddHint()
+    {
+        if (mainGameController != null)
+        {
+            mainGameController.AddHint();
+            return;
+        }
+
+        GameProgressStore.AddHint();
     }
 }

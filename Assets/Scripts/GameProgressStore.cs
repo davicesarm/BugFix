@@ -14,16 +14,19 @@ public static class GameProgressStore
 
     private static GameProgressData cachedData;
     private static bool isLoaded;
+    private static int maxHints = int.MaxValue;
 
     public static void Initialize(int maxHints)
     {
         EnsureLoaded();
 
-        cachedData.remainingHints = Mathf.Clamp(cachedData.remainingHints, 0, Mathf.Max(0, maxHints));
+        GameProgressStore.maxHints = Mathf.Max(0, maxHints);
+
+        cachedData.remainingHints = Mathf.Clamp(cachedData.remainingHints, 0, GameProgressStore.maxHints);
 
         if (!PlayerPrefs.HasKey(PlayerPrefsKey))
         {
-            cachedData.remainingHints = Mathf.Max(0, maxHints);
+            cachedData.remainingHints = GameProgressStore.maxHints;
             Save();
         }
     }
@@ -49,6 +52,14 @@ public static class GameProgressStore
         cachedData.remainingHints = Mathf.Max(0, cachedData.remainingHints - 1);
         Save();
         return true;
+    }
+
+    public static void AddHint(int amount = 1)
+    {
+        EnsureLoaded();
+
+        cachedData.remainingHints = Mathf.Clamp(cachedData.remainingHints + amount, 0, maxHints);
+        Save();
     }
 
     public static bool IsVumarkAlreadyScanned(string vumarkId)
@@ -84,9 +95,11 @@ public static class GameProgressStore
 
     public static void ResetProgress(int maxHints)
     {
+        GameProgressStore.maxHints = Mathf.Max(0, maxHints);
+
         cachedData = new GameProgressData
         {
-            remainingHints = Mathf.Max(0, maxHints),
+            remainingHints = GameProgressStore.maxHints,
             scannedVumarkIds = new List<string>()
         };
         isLoaded = true;
