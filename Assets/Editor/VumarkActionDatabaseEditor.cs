@@ -7,26 +7,39 @@ using UnityEngine;
 [CustomEditor(typeof(VumarkActionDatabase))]
 public class VumarkActionDatabaseEditor : Editor
 {
-    private const string SourcePath = "Assets/StreamingAssets/vumark_actions.json";
+    private const string SourcePath =
+        "Assets/StreamingAssets/vumark_actions.json";
 
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
 
         DrawImportSection();
+
         EditorGUILayout.Space(8f);
 
-        SerializedProperty actionsProp = serializedObject.FindProperty("actions");
-        EditorGUILayout.PropertyField(actionsProp, true);
+        SerializedProperty actionsProp =
+            serializedObject.FindProperty("actions");
+
+        EditorGUILayout.PropertyField(
+            actionsProp,
+            true
+        );
 
         serializedObject.ApplyModifiedProperties();
     }
 
     private void DrawImportSection()
     {
-        EditorGUILayout.LabelField("Import", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField(
+            "Import",
+            EditorStyles.boldLabel
+        );
+
         EditorGUILayout.HelpBox(
-            "Importa dados do arquivo: " + SourcePath + "\nFormato: { vumarkId: { acao, texto_traduzido, texto_sem_dicas, scene_name } }",
+            "Importa dados do arquivo: " +
+            SourcePath +
+            "\nFormato: { vumarkId: { acao, texto_traduzido, texto_criptografado, scene_name } }",
             MessageType.Info
         );
 
@@ -46,97 +59,313 @@ public class VumarkActionDatabaseEditor : Editor
 
     private void ClearActions()
     {
-        if (!EditorUtility.DisplayDialog("Limpar lista", "Remover todas as actions do database?", "Sim", "Cancelar"))
-            return;
+        bool confirmou =
+            EditorUtility.DisplayDialog(
+                "Limpar lista",
+                "Remover todas as actions do database?",
+                "Sim",
+                "Cancelar"
+            );
 
-        SerializedProperty actionsProp = serializedObject.FindProperty("actions");
+        if (!confirmou)
+        {
+            return;
+        }
+
+        serializedObject.Update();
+
+        SerializedProperty actionsProp =
+            serializedObject.FindProperty("actions");
+
         actionsProp.ClearArray();
+
         serializedObject.ApplyModifiedProperties();
+
         EditorUtility.SetDirty(target);
+
         AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
     }
 
     private void ImportFromJson()
     {
         if (!File.Exists(SourcePath))
         {
-            EditorUtility.DisplayDialog("Arquivo nao encontrado", "Nao foi encontrado: " + SourcePath, "OK");
+            EditorUtility.DisplayDialog(
+                "Arquivo nao encontrado",
+                "Nao foi encontrado:\n" +
+                SourcePath,
+                "OK"
+            );
+
             return;
         }
 
-        string jsonText = File.ReadAllText(SourcePath);
+        string jsonText;
+
+        try
+        {
+            jsonText =
+                File.ReadAllText(SourcePath);
+        }
+        catch (Exception ex)
+        {
+            EditorUtility.DisplayDialog(
+                "Erro ao ler arquivo",
+                "Falha ao ler o JSON:\n" +
+                ex.Message,
+                "OK"
+            );
+
+            return;
+        }
+
         JObject root;
 
         try
         {
-            root = JObject.Parse(jsonText);
+            root =
+                JObject.Parse(jsonText);
         }
         catch (Exception ex)
         {
-            EditorUtility.DisplayDialog("JSON invalido", "Falha ao ler JSON:\n" + ex.Message, "OK");
+            EditorUtility.DisplayDialog(
+                "JSON invalido",
+                "Falha ao interpretar JSON:\n" +
+                ex.Message,
+                "OK"
+            );
+
             return;
         }
 
-        SerializedProperty actionsProp = serializedObject.FindProperty("actions");
+        serializedObject.Update();
+
+        SerializedProperty actionsProp =
+            serializedObject.FindProperty("actions");
 
         actionsProp.ClearArray();
 
         int imported = 0;
-        foreach (var vumarkProperty in root.Properties())
+        int showTextSemCriptografia = 0;
+
+        foreach (
+            JProperty vumarkProperty
+            in root.Properties()
+        )
         {
-            string vumarkId = vumarkProperty.Name?.Trim();
-            if (string.IsNullOrWhiteSpace(vumarkId))
+            string vumarkId =
+                vumarkProperty.Name?.Trim();
+
+            if (
+                string.IsNullOrWhiteSpace(
+                    vumarkId
+                )
+            )
+            {
                 continue;
+            }
 
-            if (vumarkProperty.Value is not JObject data)
+            if (
+                vumarkProperty.Value
+                is not JObject data
+            )
+            {
                 continue;
+            }
 
-            string actionTypeRaw = ReadFirstNonEmpty(data, "acao", "actionType");
-            if (string.IsNullOrWhiteSpace(actionTypeRaw))
-                actionTypeRaw = VumarkActionType.ShowText.ToString();
+            string actionTypeRaw =
+                ReadFirstNonEmpty(
+                    data,
+                    "acao",
+                    "actionType"
+                );
 
-            string text = ReadFirstNonEmpty(data, "texto_traduzido", "text", "texto");
-            string textNoHints = ReadFirstNonEmpty(data, "texto_sem_dicas", "texto_sem_dica", "textNoHints");
-            string sceneName = ReadFirstNonEmpty(data, "scene_name", "sceneName");
+            if (
+                string.IsNullOrWhiteSpace(
+                    actionTypeRaw
+                )
+            )
+            {
+                actionTypeRaw =
+                    VumarkActionType
+                        .ShowText
+                        .ToString();
+            }
 
-            if (!Enum.TryParse(actionTypeRaw, true, out VumarkActionType actionType))
-                actionType = VumarkActionType.None;
+            string text =
+                ReadFirstNonEmpty(
+                    data,
+                    "texto_traduzido",
+                    "text",
+                    "texto"
+                );
 
-            int index = actionsProp.arraySize;
-            actionsProp.InsertArrayElementAtIndex(index);
-            SerializedProperty entry = actionsProp.GetArrayElementAtIndex(index);
+            string textNoHints =
+                ReadFirstNonEmpty(
+                    data,
+                    "texto_criptografado",
+                    "texto_sem_dicas",
+                    "texto_sem_dica",
+                    "textNoHints"
+                );
 
-            entry.FindPropertyRelative("vumarkId").stringValue = vumarkId;
-            entry.FindPropertyRelative("actionType").enumValueIndex = (int)actionType;
-            entry.FindPropertyRelative("text").stringValue = text;
-            entry.FindPropertyRelative("textNoHints").stringValue = textNoHints;
-            entry.FindPropertyRelative("sceneName").stringValue = sceneName;
-            entry.isExpanded = false;
+            string sceneName =
+                ReadFirstNonEmpty(
+                    data,
+                    "scene_name",
+                    "sceneName"
+                );
+
+            if (
+                !Enum.TryParse(
+                    actionTypeRaw,
+                    true,
+                    out VumarkActionType actionType
+                )
+            )
+            {
+                actionType =
+                    VumarkActionType.None;
+            }
+
+            if (
+                actionType ==
+                    VumarkActionType.ShowText &&
+                string.IsNullOrWhiteSpace(
+                    textNoHints
+                )
+            )
+            {
+                showTextSemCriptografia++;
+
+                Debug.LogWarning(
+                    $"VumarkActionDatabaseEditor: VuMark '{vumarkId}' é ShowText, mas não possui texto_criptografado."
+                );
+            }
+
+            int index =
+                actionsProp.arraySize;
+
+            actionsProp
+                .InsertArrayElementAtIndex(
+                    index
+                );
+
+            SerializedProperty entry =
+                actionsProp
+                    .GetArrayElementAtIndex(
+                        index
+                    );
+
+            entry
+                .FindPropertyRelative(
+                    "vumarkId"
+                )
+                .stringValue =
+                vumarkId;
+
+            entry
+                .FindPropertyRelative(
+                    "actionType"
+                )
+                .enumValueIndex =
+                (int)actionType;
+
+            entry
+                .FindPropertyRelative(
+                    "text"
+                )
+                .stringValue =
+                text;
+
+            entry
+                .FindPropertyRelative(
+                    "textNoHints"
+                )
+                .stringValue =
+                textNoHints;
+
+            entry
+                .FindPropertyRelative(
+                    "sceneName"
+                )
+                .stringValue =
+                sceneName;
+
+            entry.isExpanded =
+                false;
 
             imported++;
+
+            Debug.Log(
+                $"VuMark importado: {vumarkId} | " +
+                $"acao={actionType} | " +
+                $"texto='{text}' | " +
+                $"criptografado='{textNoHints}'"
+            );
         }
 
-        serializedObject.ApplyModifiedProperties();
-        EditorUtility.SetDirty(target);
-        AssetDatabase.SaveAssets();
+        serializedObject
+            .ApplyModifiedProperties();
 
-        EditorUtility.DisplayDialog("Importacao concluida", $"{imported} entries importadas.", "OK");
+        EditorUtility.SetDirty(
+            target
+        );
+
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        string mensagem =
+            $"{imported} entries importadas.";
+
+        if (showTextSemCriptografia > 0)
+        {
+            mensagem +=
+                $"\n\nATENCAO: {showTextSemCriptografia} cartas ShowText " +
+                "nao possuem texto_criptografado.";
+        }
+
+        EditorUtility.DisplayDialog(
+            "Importacao concluida",
+            mensagem,
+            "OK"
+        );
     }
 
-    private static string ReadFirstNonEmpty(JObject data, params string[] keys)
+    private static string ReadFirstNonEmpty(
+        JObject data,
+        params string[] keys
+    )
     {
-        for (int i = 0; i < keys.Length; i++)
+        for (
+            int i = 0;
+            i < keys.Length;
+            i++
+        )
         {
-            JToken token = data[keys[i]];
+            JToken token =
+                data[keys[i]];
+
             if (token == null)
+            {
                 continue;
+            }
 
-            string value = token.Type == JTokenType.String
-                ? token.Value<string>()
-                : token.ToString();
+            string value =
+                token.Type ==
+                JTokenType.String
+                    ? token.Value<string>()
+                    : token.ToString();
 
-            if (!string.IsNullOrWhiteSpace(value))
+            if (
+                !string.IsNullOrWhiteSpace(
+                    value
+                )
+            )
+            {
                 return value.Trim();
+            }
         }
 
         return string.Empty;
