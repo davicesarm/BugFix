@@ -41,6 +41,7 @@ public class LadybugMiniGameController : MonoBehaviour
     [Header("Content")]
     [SerializeField]
     private MiniGameQuestionBank questionBank;
+    
 
     [SerializeField]
     private string[] sharedAnswers = new string[3]
@@ -136,6 +137,7 @@ public class LadybugMiniGameController : MonoBehaviour
 
     public void OnAnswerSelected(int answerIndex)
     {
+
         if (isGameOver || isPaused || !questionLoaded)
         {
             Debug.LogWarning($"LadybugMiniGameController: clique ignorado (gameOver={isGameOver}, paused={isPaused}, questionLoaded={questionLoaded}).");
@@ -491,19 +493,24 @@ public class LadybugMiniGameController : MonoBehaviour
             Debug.LogWarning("LadybugMiniGameController: questionBank está vazio ou não definido.");
             return;
         }
+if (questionBag.Count == 0)
+{
+    GiveVictoryHints();
 
-        if (questionBag.Count == 0)
-        {
-            questionLoaded = false;
-            SetAnswerButtonsInteractable(false);
-            SetGameOver(true);
-            if (gameOverText != null)
-                gameOverText.text = roundCompleteMessage;
-            if (questionText != null)
-                questionText.text = roundCompleteMessage;
-            UpdateRemainingQuestionsUI(0);
-            return;
-        }
+    questionLoaded = false;
+    SetAnswerButtonsInteractable(false);
+    SetGameOver(true);
+
+    if (gameOverText != null)
+        gameOverText.text = roundCompleteMessage;
+
+    if (questionText != null)
+        questionText.text = roundCompleteMessage;
+
+    UpdateRemainingQuestionsUI(0);
+    return;
+}
+        
 
         int nextQuestionIndex = questionBag[0];
         questionBag.RemoveAt(0);
@@ -587,4 +594,9 @@ public class LadybugMiniGameController : MonoBehaviour
             Debug.LogWarning("LadybugMiniGameController: distância de queda muito alta; ajustado automaticamente para modo 3D.");
         }
     }
+
+    private void GiveVictoryHints()
+{
+    GameProgressStore.ResetProgress(3);
+}
 }
