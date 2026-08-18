@@ -8,6 +8,7 @@ public enum VumarkActionType
     ShowText,
     ShowRandomDebuff,
     LoadScene,
+    RedirectMinigame,
     None
 }
 

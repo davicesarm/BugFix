@@ -216,6 +216,11 @@ MonoBehaviour:
     text: 
     textNoHints: 
     sceneName: 
+  - vumarkId: 0ef346f4f7ab43e59f1bfeb8d4e14d4f
+    actionType: 3
+    text: Carta resposta
+    textNoHints: 
+    sceneName: Minigame
   - vumarkId: 4dda1f78983540bf94841185a641270b
     actionType: 1
     text: 

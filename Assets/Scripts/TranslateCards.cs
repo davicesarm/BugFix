@@ -232,31 +232,35 @@ public class TranslateCards : DefaultObserverEventHandler
         isSceneLoading = false;
         lastScannedVumarkId = null;
     }
-
-    private void TryStartScanConfirmation(string vumarkId)
+// TODO: Refatorar esta lógica depois. Padronizar o JSON de todas as cartas com tipo/ação explícitos para 
+//  melhorar a performance do fluxo de leitura.
+   private void TryStartScanConfirmation(string vumarkId)
+{
+    if (awaitingScanConfirmation)
     {
-        if (awaitingScanConfirmation)
-        {
-            return;
-        }
+        return;
+    }
 
-        if (IsRepeatedScan(vumarkId))
-        {
-            return;
-        }
+    if (IsRepeatedScan(vumarkId))
+    {
+        return;
+    }
 
-        if (mainGameController == null)
-        {
-            mainGameController =
-                FindAnyObjectByType<MainGameController>();
-        }
+    if (mainGameController == null)
+    {
+        mainGameController =
+            FindAnyObjectByType<MainGameController>();
+    }
 
+    if (
+        actionDatabase != null &&
+        actionDatabase.TryGetAction(
+            vumarkId,
+            out var pendingAction
+        )
+    )
+    {
         if (
-            actionDatabase != null &&
-            actionDatabase.TryGetAction(
-                vumarkId,
-                out var pendingAction
-            ) &&
             pendingAction.actionType ==
             VumarkActionType.ShowRandomDebuff
         )
@@ -271,21 +275,10 @@ public class TranslateCards : DefaultObserverEventHandler
             return;
         }
 
-        if (!HasHintsAvailable())
-        {
-            ShowTextWithoutHintsIfPossible(vumarkId);
-
-            RegisterScan(vumarkId);
-
-            ShowConfirmationButtons(false);
-
-            return;
-        }
-
-        bool isAlreadyScanned =
-            IsVumarkAlreadyScanned(vumarkId);
-
-        if (isAlreadyScanned)
+        if (
+            pendingAction.actionType ==
+            VumarkActionType.RedirectMinigame
+        )
         {
             MarkVumarkAsScanned(vumarkId);
 
@@ -296,26 +289,52 @@ public class TranslateCards : DefaultObserverEventHandler
 
             return;
         }
-
-        if (
-            confirmScanButton == null ||
-            cancelScanButton == null
-        )
-        {
-            Debug.LogWarning(
-                "TranslateCards: Botões de confirmação não configurados no Inspector."
-            );
-
-            return;
-        }
-
-        pendingConfirmationVumarkId = vumarkId;
-        awaitingScanConfirmation = true;
-
-        SetCardText(confirmationMessage);
-        ShowConfirmationButtons(true);
     }
 
+    if (!HasHintsAvailable())
+    {
+        ShowTextWithoutHintsIfPossible(vumarkId);
+
+        RegisterScan(vumarkId);
+
+        ShowConfirmationButtons(false);
+
+        return;
+    }
+
+    bool isAlreadyScanned =
+        IsVumarkAlreadyScanned(vumarkId);
+
+    if (isAlreadyScanned)
+    {
+        MarkVumarkAsScanned(vumarkId);
+
+        ExecuteVumarkAction(
+            vumarkId,
+            forceNoHintsText: false
+        );
+
+        return;
+    }
+
+    if (
+        confirmScanButton == null ||
+        cancelScanButton == null
+    )
+    {
+        Debug.LogWarning(
+            "TranslateCards: Botões de confirmação não configurados no Inspector."
+        );
+
+        return;
+    }
+
+    pendingConfirmationVumarkId = vumarkId;
+    awaitingScanConfirmation = true;
+
+    SetCardText(confirmationMessage);
+    ShowConfirmationButtons(true);
+}
     private void OnConfirmScanClicked()
     {
         Debug.Log(
@@ -840,6 +859,43 @@ public class TranslateCards : DefaultObserverEventHandler
 
                 break;
             }
+
+            case VumarkActionType.RedirectMinigame:
+{
+    if (string.IsNullOrWhiteSpace(action.sceneName))
+    {
+        Debug.LogError(
+            $"TranslateCards: sceneName não configurado para o minigame. VuMark: {vumarkId}"
+        );
+
+        break;
+    }
+
+    if (!Application.CanStreamedLevelBeLoaded(action.sceneName))
+    {
+        Debug.LogError(
+            $"TranslateCards: cena '{action.sceneName}' não está no Build Settings."
+        );
+
+        break;
+    }
+
+    if (isSceneLoading)
+    {
+        break;
+    }
+
+    isSceneLoading = true;
+
+    ResetConfirmationState(
+        hideCardModel: true,
+        clearText: true
+    );
+
+    SceneManager.LoadScene(action.sceneName);
+
+    break;
+}
 
             case VumarkActionType.LoadScene:
             {
