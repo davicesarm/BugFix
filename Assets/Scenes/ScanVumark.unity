@@ -672,7 +672,9 @@ MonoBehaviour:
   actionDatabase: {fileID: 11400000, guid: 2440834706601d14880739e0b4998b89, type: 2}
   repeatedScanCooldownSeconds: 0.4
   stableIdFramesRequired: 2
-  maxFramesToStabilize: 8
+  modelDisplayAnchor: {fileID: 0}
+  modelDisplayScaleMultiplier: 4
+  modelDisplayOffset: {x: 0, y: 5, z: 0}
   confirmationButtonsContainer: {fileID: 693932110}
   confirmScanButton: {fileID: 693932109}
   cancelScanButton: {fileID: 693932108}

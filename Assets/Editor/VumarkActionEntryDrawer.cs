@@ -15,6 +15,7 @@ public class VumarkActionEntryDrawer : PropertyDrawer
         var textProp = property.FindPropertyRelative("text");
         var textNoHintsProp = property.FindPropertyRelative("textNoHints");
         var sceneNameProp = property.FindPropertyRelative("sceneName");
+        var modelPrefabProp = property.FindPropertyRelative("modelPrefab");
 
         float y = position.y;
         float width = position.width;
@@ -70,6 +71,16 @@ public class VumarkActionEntryDrawer : PropertyDrawer
             EditorGUI.PropertyField(sceneRect, sceneNameProp);
             y += EditorGUIUtility.singleLineHeight + VerticalSpacing;
         }
+        else if (actionType == VumarkActionType.ShowModel3D)
+        {
+            Rect modelLabelRect = new Rect(position.x, y, width, EditorGUIUtility.singleLineHeight);
+            EditorGUI.LabelField(modelLabelRect, "Modelo 3D");
+            y += EditorGUIUtility.singleLineHeight + VerticalSpacing;
+
+            Rect modelFieldRect = new Rect(position.x, y, width, EditorGUIUtility.singleLineHeight);
+            EditorGUI.PropertyField(modelFieldRect, modelPrefabProp, GUIContent.none);
+            y += EditorGUIUtility.singleLineHeight + VerticalSpacing;
+        }
 
         EditorGUI.indentLevel--;
         EditorGUI.EndProperty();
@@ -100,6 +111,11 @@ public class VumarkActionEntryDrawer : PropertyDrawer
         else if (actionType == VumarkActionType.LoadScene)
         {
             height += EditorGUIUtility.singleLineHeight + VerticalSpacing;
+        }
+        else if (actionType == VumarkActionType.ShowModel3D)
+        {
+            height += EditorGUIUtility.singleLineHeight + VerticalSpacing; // label "Modelo 3D"
+            height += EditorGUIUtility.singleLineHeight + VerticalSpacing; // campo modelPrefab
         }
 
         return height;
