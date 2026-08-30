@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: VuforiaConfiguration
   m_EditorClassIdentifier: 
   vuforia:
-    vuforiaLicenseKey: AerFsaD/////AAABmTl4wtqMoUU4r/x+MlHOD9807KgHXtBX4AmQLdnRTZhOaNoZg+pAkFCIa1wUWVR+c+BZyl8Oce0fWrDWxyM/nEbLcwEaC5oQmKusRgqK2ivGZSqCwy+q7Uun8IPaZw1KyhHuViCIm9WP3SMZfbBKJvwGA8fTtuV3T+A4eJRaOlU4Ge7qHMUSRjYqNCzh+FGsRnKcGsERCSiy72U4FG3G3O7evY43paSEbSIgHtJf+vYNT9M5NIGYUlF4JCyHf6ub0yUdbJmXjtnhdDe/YJufffDz17IwPFUo3Eh86Eoj4lcAAWMNTo2wsr+xxO1fN70eW0x+XB8+IRY3DA9nhhB+IvPLiNsygu+XW+SXmVFKXYNk
-    ufoLicenseKey: QVQwcm5lbi8vLy8vQUFBQUtKa3VYQU8wM0UzYWlTVW1nWmh2dE8yRE1KNFZFMEJpWm0rYXlLeVgvNkhmYWNTK1kzUzF5OVdJNllDTkIwV080eUsrRGc3NXdaQnI4bmFLZnp1aC9wQitZcVZZelEySTljdEpjRUN0NUVBUEFlWnZTQVY4Y2gwcllSMXZHQTBjVjJTWmkvSnVjSk1hVkU0SDFrT3l3WXdNaUN3TEVTZW5oMWxENFkxTENHNlo0QlE3WmgzcFRYNzdUZ1pybjFFK0tpaERBUndlVFRnSGtndG1heWVGVS8zeXBtWTVUMUJCYWp2WmFVZVpMU1BQR3VrU2R5STdoZTRjVFpQakZ4TDNKSEV1SDBYMjkrUEhmQkZsUHIwZnVGNklHdUdORE81SWttaVpyVHRRRy9qVnRlS1p2N3RGMVc5R0x4L2cwaDdpRzBTNWloYXRLU3M5dWVVOExIRTVOVEVlK3RudEIxZ20vVU9td1VlT1pDdzU=
+    vuforiaLicenseKey: 
+    ufoLicenseKey: QVhiM0Y1Ly8vLy8vQUFBQUtPbnFIeHJFSGs1N3VrMlg4U050eVBzK2pkOFZxMDhrazlwYjBsYS9aZUIxQlV1ckZWcWt0ZllSQWpnT2tIRlY2VzdOMDRTRjNYRUhmbTF5L1BnYlB4eWdHWEF6RUNheXowc3dyNVNYa2ozdERuRjhka1FpOHRscHdkMDcrcEJEY1FjTjNJcUM1bEgwOTYzQkdZdjRsQStRb0hSQU9nRGthelp5TlY0WHVwWU9EaE05NWw5bXAzbnBDMjM5MWZBWXBFdEdiL2loTDNab3N4b25ZblhjK1JtSS9wLzRoTDIwVGhmTXR6WFJNYkpUTXZLZzJoQ0N0TEJXNEptZ0pSOUtSdStzQWM3QjVNOWFFMGVHQ1dUT1VRSUUweEpiZC9ZL2cvS29iNDhBRXdQOGFwbWR5NmRWU0FHU2psVzRZY2FEU2Zud3J1ZHhucVNmSUZiajNTUnIzM0lKVlFIaW1rL0oyOGNFeDdyekcySXg=
     delayedInitialization: 0
     cameraFocusModeSetting: 2
     cameraDeviceModeSetting: -1
@@ -24,15 +24,7 @@ MonoBehaviour:
     shareRecordingsInITunes: 0
     logLevel: 0
     version: 11.2.4
-<<<<<<< HEAD
-<<<<<<< HEAD
     eulaAcceptedVersions: '{"Values":["11.1","11.2","11.3","8.5","11.4"]}'
-=======
-    eulaAcceptedVersions: '{"Values":["11.1","11.2","11.3","11.4","8.5"]}'
->>>>>>> feat/map_cards
-=======
-    eulaAcceptedVersions: '{"Values":["11.1","11.2","11.3","11.4","8.5"]}'
->>>>>>> feat/map_cards
   database:
     disableModelExtraction: 0
   plugins:
