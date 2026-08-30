@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 public class LadybugMiniGameController : MonoBehaviour
 {
@@ -13,6 +13,9 @@ public class LadybugMiniGameController : MonoBehaviour
 
     [SerializeField]
     private TMP_Text questionText;
+
+    [SerializeField]
+    private TMP_Text remainingQuestionsText;
 
     [SerializeField]
     private TMP_Text[] answerTexts = new TMP_Text[3];
@@ -38,6 +41,7 @@ public class LadybugMiniGameController : MonoBehaviour
     [Header("Content")]
     [SerializeField]
     private MiniGameQuestionBank questionBank;
+    
 
     [SerializeField]
     private string[] sharedAnswers = new string[3]
@@ -54,6 +58,9 @@ public class LadybugMiniGameController : MonoBehaviour
     [SerializeField]
     private string gameOverMessage = "Fim de rodada!";
 
+    [SerializeField]
+    private string roundCompleteMessage = "Rodada concluída!";
+
     [Header("Ladybug Movement")]
     [SerializeField]
     private bool useLocalPosition = true;
@@ -67,16 +74,16 @@ public class LadybugMiniGameController : MonoBehaviour
     private float bottomYOffset = -2.2f;
 
     [SerializeField]
-    private float startFallDurationSeconds = 12f;
+    private float startFallDurationSeconds = 22f;
 
     [SerializeField]
     private bool reduceFallDurationPerQuestion = true;
 
     [SerializeField]
-    private float fallDurationDecreasePerQuestion = 0.1f;
+    private float fallDurationDecreasePerQuestion = 0.05f;
 
     [SerializeField]
-    private float minFallDurationSeconds = 6f;
+    private float minFallDurationSeconds = 12f;
 
     [SerializeField]
     private float riseAmountNormalizedOnCorrect = 0.25f;
@@ -90,6 +97,21 @@ public class LadybugMiniGameController : MonoBehaviour
     [Header("Feedback")]
     [SerializeField]
     private float feedbackDurationSeconds = 0.6f;
+
+    [SerializeField]
+    private AudioSource answerAudioSource;
+
+    [SerializeField]
+    private AudioClip correctAnswerClip;
+
+    [SerializeField]
+    private AudioClip wrongAnswerClip;
+
+    [SerializeField]
+    private Color correctAnswerColor = new Color(0.2f, 0.75f, 0.25f, 1f);
+
+    [SerializeField]
+    private Color wrongAnswerColor = new Color(0.85f, 0.2f, 0.2f, 1f);
 
     private int currentLives;
     private float currentFallDuration;
@@ -106,12 +128,16 @@ public class LadybugMiniGameController : MonoBehaviour
 
     private void Start()
     {
+        if (answerAudioSource == null)
+            answerAudioSource = GetComponent<AudioSource>();
+
         ConfigureAnswerButtons();
         InitializeRound();
     }
 
     public void OnAnswerSelected(int answerIndex)
     {
+
         if (isGameOver || isPaused || !questionLoaded)
         {
             Debug.LogWarning($"LadybugMiniGameController: clique ignorado (gameOver={isGameOver}, paused={isPaused}, questionLoaded={questionLoaded}).");
@@ -119,7 +145,7 @@ public class LadybugMiniGameController : MonoBehaviour
         }
 
         bool isCorrect = currentQuestion != null && answerIndex == currentQuestion.correctAnswerIndex;
-        StartCoroutine(HandleAnswerRoutine(isCorrect));
+        StartCoroutine(HandleAnswerRoutine(isCorrect, answerIndex));
     }
 
     private void Update()
@@ -161,29 +187,53 @@ public class LadybugMiniGameController : MonoBehaviour
         LoadNextQuestionRandom();
     }
 
-    private IEnumerator HandleAnswerRoutine(bool isCorrect)
+    private IEnumerator HandleAnswerRoutine(bool isCorrect, int answerIndex)
     {
         isPaused = true;
         SetAnswerButtonsInteractable(false);
+
         SetFeedback(isCorrect, !isCorrect);
+        PlayAnswerSound(isCorrect);
+        FlashAnswerButton(answerIndex, isCorrect ? correctAnswerColor : wrongAnswerColor);
 
         yield return new WaitForSeconds(feedbackDurationSeconds);
 
         SetFeedback(false, false);
+        RestoreAnswerButtonFlash();
 
         if (isCorrect)
         {
             yield return RaiseLadybugAfterCorrect();
+
+            if (isGameOver)
+                yield break;
+
+            LoadNextQuestionRandom();
+            UpdateFallDurationAfterQuestion();
+            isPaused = false;
+            yield break;
+        }
+
+        if (TryLoseLife())
+        {
             LoadNextQuestionRandom();
             UpdateFallDurationAfterQuestion();
         }
-        else
-        {
-            // Errou: continua caindo na mesma pergunta/posição.
-        }
 
-        SetAnswerButtonsInteractable(true);
-        isPaused = false;
+        if (!isGameOver)
+            isPaused = false;
+    }
+
+    private void PlayAnswerSound(bool isCorrect)
+    {
+        if (answerAudioSource == null)
+            return;
+
+        AudioClip clipToPlay = isCorrect ? correctAnswerClip : wrongAnswerClip;
+        if (clipToPlay == null)
+            return;
+
+        answerAudioSource.PlayOneShot(clipToPlay);
     }
 
     private IEnumerator RaiseLadybugAfterCorrect()
@@ -206,10 +256,34 @@ public class LadybugMiniGameController : MonoBehaviour
         fallElapsed = targetNormalized * currentFallDuration;
     }
 
-    private void LoseLife()
+    private void FlashAnswerButton(int answerIndex, Color flashColor)
+    {
+        RestoreAnswerButtonFlash();
+
+        Button button = GetAnswerButtonForIndex(answerIndex);
+        if (button == null || button.targetGraphic == null)
+            return;
+
+        flashedGraphic = button.targetGraphic;
+        flashedOriginalColor = flashedGraphic.color;
+        flashedGraphic.color = flashColor;
+    }
+
+    private void RestoreAnswerButtonFlash()
+    {
+        if (flashedGraphic != null)
+            flashedGraphic.color = flashedOriginalColor;
+
+        flashedGraphic = null;
+    }
+
+    private Graphic flashedGraphic;
+    private Color flashedOriginalColor;
+
+    private bool TryLoseLife()
     {
         if (isGameOver)
-            return;
+            return false;
 
         currentLives--;
         UpdateLifeUI();
@@ -217,8 +291,16 @@ public class LadybugMiniGameController : MonoBehaviour
         if (currentLives <= 0)
         {
             EndRound();
-            return;
+            return false;
         }
+
+        return true;
+    }
+
+    private void LoseLife()
+    {
+        if (!TryLoseLife())
+            return;
 
         StartCoroutine(ResetAfterLifeLossRoutine());
     }
@@ -249,8 +331,10 @@ public class LadybugMiniGameController : MonoBehaviour
     {
         isGameOver = true;
         isPaused = true;
+        questionLoaded = false;
         SetAnswerButtonsInteractable(false);
         SetGameOver(true);
+        UpdateRemainingQuestionsUI(0);
     }
 
     private void SetGameOver(bool enabled)
@@ -276,7 +360,7 @@ public class LadybugMiniGameController : MonoBehaviour
         if (answerButtons == null)
             return;
 
-        foreach (var button in answerButtons)
+        foreach (Button button in answerButtons)
         {
             if (button != null)
                 button.interactable = enabled;
@@ -305,9 +389,11 @@ public class LadybugMiniGameController : MonoBehaviour
         {
             TMP_Text label = GetAnswerLabelForIndex(i);
             if (label != null)
+            {
                 label.text = question != null
                     ? question.GetAnswerText(i, sharedAnswers[i])
                     : sharedAnswers[i];
+            }
         }
     }
 
@@ -329,19 +415,12 @@ public class LadybugMiniGameController : MonoBehaviour
         return null;
     }
 
-    private TMP_Text[] BuildLabelsFromButtons()
+    private Button GetAnswerButtonForIndex(int index)
     {
-        if (answerButtons == null)
+        if (answerButtons == null || index < 0 || index >= answerButtons.Length)
             return null;
 
-        TMP_Text[] labels = new TMP_Text[answerButtons.Length];
-        for (int i = 0; i < answerButtons.Length; i++)
-        {
-            if (answerButtons[i] != null)
-                labels[i] = answerButtons[i].GetComponentInChildren<TMP_Text>(true);
-        }
-
-        return labels;
+        return answerButtons[index];
     }
 
     private void ConfigureAnswerButtons()
@@ -355,14 +434,29 @@ public class LadybugMiniGameController : MonoBehaviour
             if (button == null)
                 continue;
 
-            // Se o botão já tem OnClick configurado no Inspector,
-            // evitamos adicionar outro listener para não processar resposta em duplicidade.
-            if (button.onClick.GetPersistentEventCount() > 0)
+            if (HasPersistentAnswerSubmitListener(button))
                 continue;
 
             int answerIndex = i;
             button.onClick.AddListener(() => OnAnswerSelected(answerIndex));
         }
+    }
+
+    private bool HasPersistentAnswerSubmitListener(Button button)
+    {
+        if (button == null)
+            return false;
+
+        int persistentCount = button.onClick.GetPersistentEventCount();
+        for (int i = 0; i < persistentCount; i++)
+        {
+            string methodName = button.onClick.GetPersistentMethodName(i);
+
+            if (methodName == nameof(OnAnswerSelected) || methodName == nameof(MiniGameAnswerButton.SubmitAnswer))
+                return true;
+        }
+
+        return false;
     }
 
     private void BuildQuestionBag()
@@ -373,9 +467,7 @@ public class LadybugMiniGameController : MonoBehaviour
             return;
 
         for (int i = 0; i < questionBank.Questions.Count; i++)
-        {
             questionBag.Add(i);
-        }
 
         ShuffleQuestionBag();
     }
@@ -397,14 +489,28 @@ public class LadybugMiniGameController : MonoBehaviour
             SetAnswerButtonsInteractable(false);
             if (questionText != null)
                 questionText.text = "Sem perguntas no banco.";
+            UpdateRemainingQuestionsUI(0);
             Debug.LogWarning("LadybugMiniGameController: questionBank está vazio ou não definido.");
             return;
         }
+if (questionBag.Count == 0)
+{
+    GiveVictoryHints();
 
-        if (questionBag.Count == 0)
-        {
-            BuildQuestionBag();
-        }
+    questionLoaded = false;
+    SetAnswerButtonsInteractable(false);
+    SetGameOver(true);
+
+    if (gameOverText != null)
+        gameOverText.text = roundCompleteMessage;
+
+    if (questionText != null)
+        questionText.text = roundCompleteMessage;
+
+    UpdateRemainingQuestionsUI(0);
+    return;
+}
+        
 
         int nextQuestionIndex = questionBag[0];
         questionBag.RemoveAt(0);
@@ -413,6 +519,7 @@ public class LadybugMiniGameController : MonoBehaviour
         questionLoaded = currentQuestion != null;
         SetAnswerButtonsInteractable(questionLoaded);
         UpdateAnswerLabels(currentQuestion);
+        UpdateRemainingQuestionsUI(questionBag.Count);
 
         if (questionText != null)
         {
@@ -420,6 +527,14 @@ public class LadybugMiniGameController : MonoBehaviour
                 ? currentQuestion.questionText
                 : "Pergunta inválida.";
         }
+    }
+
+    private void UpdateRemainingQuestionsUI(int remainingQuestions)
+    {
+        if (remainingQuestionsText == null)
+            return;
+
+        remainingQuestionsText.text = $"Perguntas restantes: {remainingQuestions}";
     }
 
     private void UpdateFallDurationAfterQuestion()
@@ -440,6 +555,7 @@ public class LadybugMiniGameController : MonoBehaviour
 
         Vector3 pos = useLocalPosition ? ladybugTransform.localPosition : ladybugTransform.position;
         pos.y = y;
+
         if (useLocalPosition)
             ladybugTransform.localPosition = pos;
         else
@@ -478,4 +594,9 @@ public class LadybugMiniGameController : MonoBehaviour
             Debug.LogWarning("LadybugMiniGameController: distância de queda muito alta; ajustado automaticamente para modo 3D.");
         }
     }
+
+    private void GiveVictoryHints()
+{
+    GameProgressStore.ResetProgress(3);
+}
 }

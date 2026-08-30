@@ -25,7 +25,11 @@ MonoBehaviour:
     logLevel: 0
     version: 11.2.4
 <<<<<<< HEAD
+<<<<<<< HEAD
     eulaAcceptedVersions: '{"Values":["11.1","11.2","11.3","8.5","11.4"]}'
+=======
+    eulaAcceptedVersions: '{"Values":["11.1","11.2","11.3","11.4","8.5"]}'
+>>>>>>> feat/map_cards
 =======
     eulaAcceptedVersions: '{"Values":["11.1","11.2","11.3","11.4","8.5"]}'
 >>>>>>> feat/map_cards

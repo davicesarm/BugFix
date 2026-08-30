@@ -11,6 +11,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MainScene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Scenes/Minigame.unity
+    guid: bdccb4bb8912d7b43995ae21e5ecf0f5
+  - enabled: 1
+    path: Assets/Scenes/ScanVumark.unity
+    guid: fd4c31523efa1d04fad69b8aa38963f1
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 289c1b55c9541489481df5cc06664110, type: 3}
   m_UseUCBPForAssetBundles: 0
