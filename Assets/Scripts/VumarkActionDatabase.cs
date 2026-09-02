@@ -9,6 +9,7 @@ public enum VumarkActionType
     ShowRandomDebuff,
     LoadScene,
     RedirectMinigame,
+    ShowModel3D,
     None
 }
 
@@ -25,6 +26,10 @@ public class VumarkActionEntry
     public string textNoHints;
 
     public string sceneName;
+
+    public GameObject modelPrefab;
+
+    public Trophy trophyToUnlock;
 }
 
 [CreateAssetMenu(

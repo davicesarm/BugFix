@@ -15,5 +15,5 @@ MonoBehaviour:
   trophyId: BEE02
   trophyName: Bee 02
   description: B
-  model: {fileID: 0}
+  model: {fileID: 8847242335712014154, guid: d40ee19a6294d2e41a311a173c29858c, type: 3}
   icon: {fileID: 0}
